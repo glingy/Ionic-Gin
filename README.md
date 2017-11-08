@@ -1,1 +1,1 @@
-ionicGin
+A version of Ionic Gin written in C. Press space to draw, dumpster dive, or select cards. Press c to combine ions if possible, and press d to discard the highlighted ion at the end of the turn.

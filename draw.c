@@ -20,20 +20,30 @@ void printDiscard() {
     int pHeight = height - 3;
     int discardHighlight = (highlight >= hand ? -1 : highlight) ;
     for (int i = discard; (y < pHeight && i < hand); i++) {
+        mvaddch(y + 1, x + 12, ' ');
+        mvaddch(y + 1, x - 1, ' ');
         if (discardHighlight == i) {
-            attrset(COLOR_PAIR(1));
+            //attrset(COLOR_PAIR(1));
+            attrset(A_REVERSE);
             mvprintw(++y, x, getLatin(deck[i]));
             mvprintw(++y, x, getEnglish(deck[i]));
-            attrset(COLOR_PAIR(0));
+            attrset(A_NORMAL);
+            mvaddch(y - 1, x + 12, '*');
+            mvaddch(y - 1, x - 1, '*');
+            //attrset(COLOR_PAIR(0));
         } else if (discardHighlight > i) {
-            attrset(COLOR_PAIR(2));
+            //attrset(COLOR_PAIR(2));
             mvprintw(++y, x, getLatin(deck[i]));
-            attrset(COLOR_PAIR(0));
+            mvaddch(y, x - 1, '*');
+            mvaddch(y, x + 12, '*');
+            //attrset(COLOR_PAIR(0));
         } else {
             mvprintw(++y, x, getLatin(deck[i]));
         }
         if (y != pHeight) {
             drawHorLine(x, ++y, 12);
+            mvaddch(y, x - 1, ' ');
+            mvaddch(y, x + 12, ' ');
         }
         if (y == pHeight) {
             cols--;
@@ -47,28 +57,42 @@ void printDiscard() {
             y = 1;
         }
     }
-    mvprintw(++y, x, "            ");
+    mvprintw(++y, x, "             ");
 }
 
 void printHand() {
     int y = (height/2);
-    int x = 40;
+    int x = 41;
     int cols = (width - x - 1) / 15;
     int rows = (height/2 - height % 4)/2 - 1;
     int pHeight = height - 2 - ((height/2)%2);
     int handHighlight = (highlight >= played ? 0 : highlight) ;
     for (int i = hand; (y < pHeight && i < played); i++) {
+        if (isSelected(i)) {
+            mvaddch(y + 1, x + 12, '*');
+            mvaddch(y + 1, x - 1, '*');
+        } else {
+            mvaddch(y + 1, x + 12, ' ');
+            mvaddch(y + 1, x - 1, ' ');
+        }
+        
         if (handHighlight == i) {
-            attrset(COLOR_PAIR(1));
+            attrset(A_REVERSE);
             mvprintw(++y, x, getLatin(deck[i]));
             mvprintw(++y, x, getEnglish(deck[i]));
-            attrset(COLOR_PAIR(0));
+            attrset(A_NORMAL);
+            mvaddch(y, x + 12, ' ');
+            mvaddch(y, x - 1, ' ');
         } else {
             mvprintw(++y, x, getLatin(deck[i]));
         }
+        
         if (y != pHeight) {
             drawHorLine(x, ++y, 12);
+            mvaddch(y, x + 12, ' ');
+            mvaddch(y, x - 1, ' ');
         }
+        
         if (y == pHeight) {
             cols--;
             if (cols == 0) {
@@ -98,7 +122,7 @@ void printLines() {
 
 void drawDeck() {
     mvprintw(0, 0, "  Draw  ");
-    attrset(COLOR_PAIR(highlight == discard - 1 ? 1: 0));
+    attrset(highlight == discard - 1 ? A_REVERSE: A_NORMAL);
     mvprintw(1, 1, "      ");
     mvprintw(2, 1, "      ");
     mvprintw(3, 1, "      ");
@@ -112,7 +136,42 @@ void drawDeck() {
     drawHorLine(2, 5, 4);
     drawVertLine(1, 2, 3);
     drawVertLine(6, 2, 3);
-    attrset(COLOR_PAIR(0));
+    attrset(A_NORMAL);
+    mvprintw(9, 0, "Score:");
+    mvprintw(10, 0, "   %d  ", score);
+    
+    mvprintw(12, 0, "Round:");
+    mvprintw(13, 0, "   %d", roundNum);
+
+    mvprintw(15, 0, "%s", (drawing ? "Draw or" : "Play or"));
+    mvprintw(16, 0, "%s", (drawing ? "  Dive " : "Discard"));
+
+    mvprintw(18, 0, "%s", (incorrect ? "Wrong" : "     "));
+    incorrect = false;
+
+    mvprintw(20, 0, "Sel:  _");
+    mvprintw(21, 0, "Play: c");
+    mvprintw(22, 0, "Disc: d");
+}
+
+void printIons() {
+    int y = 1;
+    int x = 41;
+    int cols = (width - x - 1) / 40;
+    int pHeight = height/2;
+    for (int i = numIons - 1; i >= 0; i--) {
+        //mvprintw(0, x, "0x%08x\n", ions[i]);
+        mvprintw(++y, x, "%s %s %s", getLatin((ions[i] & 0x00FF0000) >> 16), getLatin((ions[i] & 0x0000FF00) >> 8), ((ions[i] & 0x000000FF) == 0xFF) ? "            ": getLatin(ions[i] & 0x000000FF));
+        if (y == pHeight) {
+            y = 1;
+            x += 40;
+            drawVertLine(x - 2, y + 1, pHeight);
+            cols--;
+            if (cols == -1) {
+                return;
+            }
+        }
+    }
 }
 
 /*void printList(int x, int y, int rows, int count, int cols, char * list, char highlight) {
