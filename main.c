@@ -87,6 +87,9 @@ int main(int argc, const char ** argv) {
                 break;
             case 'd':
                 discardSel();
+                erase();
+                printLines();
+                refresh();
                 break;
             default: continue;
         }
@@ -117,7 +120,6 @@ void mvRight() {
     if (highlight == discard - 1) {
         highlight = discard;
     } else if (highlight < (discard + ((height/2) - 2)) && (discard + ((height/2) - 2)) < hand) {
-        mvprintw(17, 0, "%d, %d, %d", hand, played, highlight);
         if (highlight + ((height/2) - 2) >= hand) {
             highlight = hand - 1;
         } else {
@@ -128,6 +130,6 @@ void mvRight() {
         highlight = hand;
     } else if (highlight >= hand) {
         //mvprintw(18, 0, "FOUR");        
-        highlight = (highlight + ((height/2 - height % 4)/2) < played ? highlight + ((height/2 - height % 4)/2) : played - 1);
+        highlight = ((highlight + ((height/2 - height % 4)/2)) < played ? (highlight + ((height/2 - height % 4)/2)): played - 1);
     }
 }

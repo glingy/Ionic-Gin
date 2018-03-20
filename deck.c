@@ -262,6 +262,10 @@ void setSelectionPlayed() {
         deck[played + i] = cards[i];
     }
     numSelected = 0;
+
+    if (highlight >= played) {
+        highlight = played - 1;
+    }
 }
 
 void discardSel() {
@@ -274,6 +278,7 @@ void discardSel() {
         hand++;
         numSelected = 0;
         highlight = discard;
+        discard -= 3;
         drawing = true;
         roundNum++;
     }
